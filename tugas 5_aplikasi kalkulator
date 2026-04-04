@@ -1,0 +1,119 @@
+package com.example.calculator
+
+import android.os.Bundle
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.unit.dp
+
+class MainActivity : ComponentActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContent {
+            MaterialTheme {
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = MaterialTheme.colorScheme.background
+                ) {
+                    SimpleCalculator()
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun SimpleCalculator() {
+    var num1 by remember { mutableStateOf("") }
+    var num2 by remember { mutableStateOf("") }
+    var result by remember { mutableStateOf("") }
+
+    fun calculate(operator: String) {
+        val n1 = num1.toDoubleOrNull()
+        val n2 = num2.toDoubleOrNull()
+
+        if (n1 == null || n2 == null) {
+            result = "Input tidak valid!"
+            return
+        }
+
+        result = when (operator) {
+            "+" -> (n1 + n2).toString()
+            "-" -> (n1 - n2).toString()
+            "*" -> (n1 * n2).toString()
+            "/" -> {
+                if (n2 != 0.0) (n1 / n2).toString()
+                else "Error: Tidak bisa dibagi nol!"
+            }
+            else -> ""
+        }
+    }
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+
+        TextField(
+            value = num1,
+            onValueChange = { num1 = it },
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+            modifier = Modifier.fillMaxWidth(),
+            singleLine = true
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        TextField(
+            value = num2,
+            onValueChange = { num2 = it },
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+            modifier = Modifier.fillMaxWidth(),
+            singleLine = true
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        TextField(
+            value = result,
+            onValueChange = {},
+            readOnly = true,
+            label = { Text("Result") },
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceEvenly
+        ) {
+            val buttonColors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFF7043))
+
+            Button(onClick = { calculate("+") }, colors = buttonColors) { Text("+") }
+            Button(onClick = { calculate("-") }, colors = buttonColors) { Text("-") }
+            Button(onClick = { calculate("*") }, colors = buttonColors) { Text("*") }
+            Button(onClick = { calculate("/") }, colors = buttonColors) { Text("/") }
+
+            Button(
+                onClick = {
+                    num1 = ""
+                    num2 = ""
+                    result = ""
+                },
+                colors = buttonColors
+            ) {
+                Text("Clear")
+            }
+        }
+    }
+}
